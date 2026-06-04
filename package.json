@@ -3,10 +3,10 @@
   "version": "2.3.0",
   "license": "MIT",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
     "build": "next build",
     "build:lang": "node scripts/buildWithLang.js",
-    "start": "next start",
+    "start": "npx serve@latest out -p 3001",
     "lint": "eslint",
     "outdated": "ncu"
   },
