@@ -230,6 +230,10 @@
     "callParamsGroup": "Tham số gọi"
   },
   "tools": {
+    "subtitleMerger": {
+      "title": "Gộp Phụ Đề",
+      "description": "Gộp hai phụ đề thành một phụ đề song ngữ, tự động đồng bộ theo thời gian và lọc rác."
+    },
     "subtitleTranslator": {
       "title": "Dịch giả Phụ đề",
       "description": "Dịch hàng loạt SRT, ASS, VTT, LRC. 120+ ngôn ngữ.",

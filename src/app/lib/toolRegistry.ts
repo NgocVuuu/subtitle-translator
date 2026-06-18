@@ -93,6 +93,7 @@ type ToolEntry = {
  */
 export const TOOL_REGISTRY = {
   subtitleTranslator:   { path: "subtitle-translator",    category: "MultimediaApplication", group: "translate",  namespaces: ["SubtitleTranslator", "TranslationSettings"] },
+  subtitleMerger:       { path: "subtitle-merger",        category: "MultimediaApplication", group: "translate",  namespaces: ["SubtitleMerger"] },
   mdTranslator:         { path: "md-translator",          category: "BusinessApplication",   group: "translate",  namespaces: ["MDTranslator", "TranslationSettings"] },
   jsonTranslate:        { path: "json-translate",         category: "DeveloperApplication",  group: "translate",  namespaces: ["JSON", "TranslationSettings"] },
   textSplitter:         { path: "text-splitter",          category: "UtilitiesApplication",  group: "textParser", namespaces: ["TextSplitter"] },
@@ -131,7 +132,8 @@ export const TOOL_KEYS = Object.keys(TOOL_REGISTRY) as ToolKey[];
  * users discover adjacent tools.
  */
 export const RELATED_TOOLS: Record<ToolKey, ToolKey[]> = {
-  subtitleTranslator:   ["mdTranslator", "jsonTranslate", "textSplitter"],
+  subtitleTranslator:   ["subtitleMerger", "mdTranslator", "jsonTranslate"],
+  subtitleMerger:       ["subtitleTranslator", "mdTranslator", "textSplitter"],
   mdTranslator:         ["subtitleTranslator", "jsonTranslate", "textSplitter"],
   jsonTranslate:        ["mdTranslator", "subtitleTranslator", "jsonValueExtractor"],
   textSplitter:         ["textToolbox", "novelProcessor", "mdTranslator"],
