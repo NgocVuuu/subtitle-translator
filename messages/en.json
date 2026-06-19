@@ -165,6 +165,25 @@
     "textExtracted": "Subtitle text extracted, ",
     "bilingualError": "Complex style tags detected. Bilingual mode may cause formatting issues. Recommended to disable 'Bilingual Subtitles'."
   },
+  "SubtitleMerger": {
+    "title": "Bilingual Subtitle Merger",
+    "description": "Tool to merge 2 subtitle files (e.g. English and Vietnamese) into a single file. The system automatically filters out junk lines and syncs by time.",
+    "primaryCard": "Primary Subtitle - Displays at Bottom",
+    "secondaryCard": "Secondary Subtitle - Displays at Top",
+    "uploadHint": "Click or drag file to this area to upload",
+    "timeOffset": "Time Shift (seconds):",
+    "outputFormat": "Output Format:",
+    "formatAss": "ASS (Best)",
+    "formatSrt": "SRT (Standard)",
+    "formatVtt": "VTT (For Web)",
+    "mergeBtn": "Merge & Download",
+    "errorMissingFiles": "Please upload subtitle files on both sides.",
+    "successMerge": "Subtitles merged successfully!",
+    "errorMerge": "An error occurred while merging subtitles.",
+    "errorCountMismatch": "The number of files on both sides does not match. Please ensure both sides have the same number of files.",
+    "clearBtn": "Clear all",
+    "fileCount": "Uploaded {count} files"
+  },
   "TranslationSettings": {
     "resetConfigSuccess": "Configuration reset to defaults",
     "resetCacheConfirm": "Clear all translation cache? This cannot be undone.",
@@ -299,6 +318,10 @@
     "jsonTranslate": {
       "title": "JSON Multi-Language Translator",
       "description": "Efficient multi-language JSON translation tool"
+    },
+    "subtitleMerger": {
+      "title": "Subtitle Merger",
+      "description": "Merge two subtitles into bilingual subtitles, auto-sync and filter ads."
     },
     "mdTranslator": {
       "title": "Markdown Translator",

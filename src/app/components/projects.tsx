@@ -35,7 +35,7 @@ interface Project {
 }
 
 const projectCategories = {
-  translate: ["json-translate", "subtitle-translator", "md-translator"],
+  translate: ["json-translate", "subtitle-translator", "subtitle-merger", "md-translator"],
   textParser: ["text-splitter", "chinese-conversion", "novel-processor", "regex-matcher", "text-processor"],
   jsonParser: ["json-value-extractor", "json-node-edit", "json-value-transformer", "json-value-swapper", "json-node-inserter", "json-sort-classify", "json-match-update"],
   dataParser: ["data-parser/flare", "data-parser/img-prompt"],
@@ -53,6 +53,12 @@ export const projects = [
     descriptionKey: "tools.subtitleTranslator.description",
     key: "subtitle-translator",
     icon: <VideoCameraOutlined />,
+  },
+  {
+    titleKey: "tools.subtitleMerger.title",
+    descriptionKey: "tools.subtitleMerger.description",
+    key: "subtitle-merger",
+    icon: <FileSyncOutlined />,
   },
   {
     titleKey: "tools.mdTranslator.title",
@@ -166,7 +172,7 @@ export const useAppMenu = () => {
       return null;
     }
     return {
-      label: <Link href={`https://tools.newzone.top/${locale}/${project.key}`}>{project.onlyzh && locale === "zh" ? project.titleKey : t(project.titleKey)}</Link>,
+      label: <Link href={`/${locale}/${project.key}`}>{project.onlyzh && locale === "zh" ? project.titleKey : t(project.titleKey)}</Link>,
       key: project.key,
       icon: project.icon,
     };

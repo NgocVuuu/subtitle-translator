@@ -169,7 +169,7 @@ export function mergeSubtitles(
                 output += `${counter}\n`;
             }
             output += `${start} --> ${end}\n`;
-            output += `${b.primaryText}\n${b.secondaryText}\n\n`;
+            output += `${b.secondaryText}\n${b.primaryText}\n\n`;
             counter++;
         }
         return output.trim() + "\n";

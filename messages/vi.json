@@ -162,8 +162,27 @@
     "noFileUploaded": "Vui lòng tải tệp phụ đề lên trước.",
     "noSourceText": "Vui lòng tải tệp hoặc dán văn bản.",
     "noExtractedText": "Không trích xuất được nội dung, kiểm tra định dạng tệp.",
-    "textExtracted": "Đã trích xuất văn bản phụ đề, ",
-    "bilingualError": "Phát hiện thẻ kiểu phức tạp. Chế độ song ngữ có thể gây lỗi định dạng. Khuyên dùng tắt 'Phụ đề song ngữ'."
+    "textExtracted": "Đã trích xuất nội dung văn bản phụ đề, ",
+    "bilingualError": "Đã phát hiện thẻ phong cách phức tạp. Chế độ song ngữ có thể gây ra vấn đề định dạng. Khuyên dùng tắt chế độ 'Phụ đề Song ngữ'."
+  },
+  "SubtitleMerger": {
+    "title": "Gộp Phụ Đề Song Ngữ",
+    "description": "Công cụ giúp ghép 2 file phụ đề (ví dụ: Tiếng Anh và Tiếng Việt) thành 1 file phụ đề duy nhất. Hệ thống tự động lọc các dòng rác và đồng bộ theo thời gian.",
+    "primaryCard": "Phụ đề gốc (Primary) - Hiển thị ở dưới",
+    "secondaryCard": "Phụ đề dịch (Secondary) - Hiển thị ở trên",
+    "uploadHint": "Nhấp hoặc kéo thả file vào đây",
+    "timeOffset": "Dịch chuyển thời gian (giây):",
+    "outputFormat": "Định dạng xuất ra:",
+    "formatAss": "ASS (Đẹp nhất)",
+    "formatSrt": "SRT (Phổ biến)",
+    "formatVtt": "VTT (Cho Web)",
+    "mergeBtn": "Gộp & Tải xuống",
+    "errorMissingFiles": "Vui lòng tải lên file phụ đề ở cả 2 bên.",
+    "successMerge": "Gộp phụ đề thành công!",
+    "errorMerge": "Có lỗi xảy ra khi gộp phụ đề.",
+    "errorCountMismatch": "Số lượng file 2 bên không khớp. Vui lòng đảm bảo tải lên cùng số lượng file cho cả Primary và Secondary.",
+    "clearBtn": "Xóa tất cả",
+    "fileCount": "Đã tải lên {count} file"
   },
   "TranslationSettings": {
     "resetConfigSuccess": "Đã đặt lại cấu hình về mặc định",
