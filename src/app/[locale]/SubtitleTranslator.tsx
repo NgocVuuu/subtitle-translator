@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useRef } from "react";
-import { Flex, Card, Button, Typography, Input, Upload, Form, Space, App, Tooltip, Segmented, Spin, Row, Col, Divider, Collapse, Alert, theme } from "antd";
+import { Flex, Card, Button, Typography, Input, InputNumber, Upload, Form, Space, App, Tooltip, Segmented, Spin, Row, Col, Divider, Collapse, Alert, theme } from "antd";
 import { CopyOutlined, InboxOutlined, SettingOutlined, FileTextOutlined, ClearOutlined, FormatPainterOutlined, GlobalOutlined, ImportOutlined, SaveOutlined, ControlOutlined } from "@ant-design/icons";
 import { useTranslations } from "next-intl";
 import { useCopyToClipboard } from "@/app/hooks/useCopyToClipboard";
@@ -23,6 +23,7 @@ import {
   vttToSrt,
   appendBilingualSuffix,
   buildAssBilingualBody,
+  shiftSubtitleTime,
   type BilingualFormat,
 } from "./subtitleUtils";
 import { LLM_MODELS } from "@/app/lib/translation";
@@ -142,6 +143,7 @@ const SubtitleTranslator = () => {
   // ASS/SRT 格式选项只在 SRT/VTT 源 + 双语时显示——ASS/LRC 源选项无法兑现,避免 UI 撒谎
   const showBilingualFormatChoice = needsBilingual && (sourceFileType === "srt" || sourceFileType === "vtt");
   const [contextAware, setContextAware] = useLocalStorage("subtitle-translator-contextAware", true); // 上下文感知翻译开关
+  const [timeOffset, setTimeOffset] = useLocalStorage<number>("subtitle-translator-timeOffset", 0);
   const [collapseKeys, setCollapseKeys] = useLocalStorage<string[]>("subtitle-translator-collapseKeys", ["SubtitleTranslator"]);
   const [multiLangModalOpen, setMultiLangModalOpen] = useState(false);
   // 提取出的纯文本预览 — 只在 SubtitleTranslator 和 MDTranslator 用,
@@ -324,8 +326,14 @@ const SubtitleTranslator = () => {
         // Handle different export modes
         if (exportMode === "both") {
           // Generate and download both translated-only and bilingual versions
-          const translatedOnlySubtitle = generateSubtitle(false, translatedLines);
-          const bilingualSubtitle = generateSubtitle(true, translatedLines);
+          let translatedOnlySubtitle = generateSubtitle(false, translatedLines);
+          let bilingualSubtitle = generateSubtitle(true, translatedLines);
+          
+          if (timeOffset !== 0) {
+            translatedOnlySubtitle = shiftSubtitleTime(translatedOnlySubtitle, fileType, timeOffset * 1000);
+            bilingualSubtitle = shiftSubtitleTime(bilingualSubtitle, fileType, timeOffset * 1000);
+          }
+
           const translatedOnlyExt = getOutputFileExtension(fileType, false);
           const bilingualExt = getOutputFileExtension(fileType, true, bilingualFormat);
 
@@ -352,7 +360,12 @@ const SubtitleTranslator = () => {
           }
         } else {
           // Generate single version based on mode
-          const finalSubtitle = generateSubtitle(needsBilingual, translatedLines);
+          let finalSubtitle = generateSubtitle(needsBilingual, translatedLines);
+          
+          if (timeOffset !== 0) {
+            finalSubtitle = shiftSubtitleTime(finalSubtitle, fileType, timeOffset * 1000);
+          }
+
           const fileExt = getOutputFileExtension(fileType, needsBilingual, bilingualFormat);
           const downloadFileName = generateFileName(fileName, langLabel, fileExt);
 
@@ -751,7 +764,18 @@ const SubtitleTranslator = () => {
                       setUseCache={setUseCache}
                       singleFileMode={singleFileMode}
                       setSingleFileMode={setSingleFileMode}
-                    />
+                    >
+                      <Form layout="vertical">
+                        <Form.Item label={tSubtitle("timeOffset")} className="!mb-3">
+                          <InputNumber
+                            value={timeOffset}
+                            onChange={(value: number | null) => setTimeOffset(value ?? 0)}
+                            step={0.1}
+                            className="!w-full"
+                          />
+                        </Form.Item>
+                      </Form>
+                    </AdvancedTranslationSettings>
                   ),
                 },
               ]}

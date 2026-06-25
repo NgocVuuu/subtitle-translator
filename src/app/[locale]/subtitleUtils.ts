@@ -445,3 +445,82 @@ Style: Secondary,Noto Sans,55,&H003CF7F4,&H000000FF,&H00000000,&H00000000,0,0,0,
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text`;
+
+/**
+ * Dịch chuyển toàn bộ timestamp trong file text phụ đề đi một khoảng thời gian cố định.
+ */
+export function shiftSubtitleTime(text: string, fileType: string, offsetMs: number): string {
+    if (offsetMs === 0) return text;
+    
+    const shiftMs = (ms: number) => Math.max(0, ms + offsetMs);
+
+    if (fileType === "srt" || fileType === "vtt") {
+        return text.replace(/(?:(\d+):)?(\d{2}):(\d{2})([,.])(\d{1,3})/g, (match, h, m, s, sep, msStr) => {
+            const hours = parseInt(h || "0", 10);
+            const minutes = parseInt(m, 10);
+            const seconds = parseInt(s, 10);
+            const milliseconds = parseInt(msStr.padEnd(3, "0"), 10);
+            const totalMs = hours * 3600000 + minutes * 60000 + seconds * 1000 + milliseconds;
+            const newTotalMs = shiftMs(totalMs);
+            
+            const newHours = Math.floor(newTotalMs / 3600000);
+            const newMinutes = Math.floor((newTotalMs % 3600000) / 60000);
+            const newSeconds = Math.floor((newTotalMs % 60000) / 1000);
+            const newMilliseconds = newTotalMs % 1000;
+            
+            const hStr = h ? String(newHours).padStart(h.length, "0") : String(newHours).padStart(2, "0");
+            const mStr = String(newMinutes).padStart(2, "0");
+            const sStr = String(newSeconds).padStart(2, "0");
+            const msStrOut = String(newMilliseconds).padStart(3, "0").substring(0, msStr.length);
+            
+            return `${hStr}:${mStr}:${sStr}${sep}${msStrOut}`;
+        });
+    } else if (fileType === "ass") {
+        return text.replace(/(Dialogue:\s*\d+,)([^,]*),([^,]*)(,.*)/g, (match, prefix, start, end, suffix) => {
+            const shiftAssTime = (t: string) => {
+                const parts = t.trim().split(":");
+                if (parts.length !== 3) return t;
+                const h = parseInt(parts[0], 10);
+                const m = parseInt(parts[1], 10);
+                const sParts = parts[2].split(".");
+                const s = parseInt(sParts[0], 10);
+                const cs = parseInt(sParts[1], 10);
+                const totalMs = h * 3600000 + m * 60000 + s * 1000 + cs * 10;
+                const newTotalMs = shiftMs(totalMs);
+                
+                const newHours = Math.floor(newTotalMs / 3600000);
+                const newMinutes = Math.floor((newTotalMs % 3600000) / 60000);
+                const newSeconds = Math.floor((newTotalMs % 60000) / 1000);
+                const newCs = Math.floor((newTotalMs % 1000) / 10);
+                return `${newHours}:${String(newMinutes).padStart(2, "0")}:${String(newSeconds).padStart(2, "0")}.${String(newCs).padStart(2, "0")}`;
+            };
+            return `${prefix}${shiftAssTime(start)},${shiftAssTime(end)}${suffix}`;
+        });
+    } else if (fileType === "lrc") {
+        return text.replace(/\[(\d{2}):(\d{2})(?:\.(\d{2,3}))?\]/g, (match, m, s, msStr) => {
+            const minutes = parseInt(m, 10);
+            const seconds = parseInt(s, 10);
+            const milliseconds = msStr ? parseInt(msStr.padEnd(3, "0"), 10) : 0;
+            const totalMs = minutes * 60000 + seconds * 1000 + milliseconds;
+            const newTotalMs = shiftMs(totalMs);
+            
+            const newMinutes = Math.floor(newTotalMs / 60000);
+            const newSeconds = Math.floor((newTotalMs % 60000) / 1000);
+            
+            if (msStr) {
+                const newMilliseconds = newTotalMs % 1000;
+                let msStrOut = "";
+                if (msStr.length === 2) {
+                    msStrOut = String(Math.floor(newMilliseconds / 10)).padStart(2, "0");
+                } else {
+                    msStrOut = String(newMilliseconds).padStart(3, "0");
+                }
+                return `[${String(newMinutes).padStart(2, "0")}:${String(newSeconds).padStart(2, "0")}.${msStrOut}]`;
+            } else {
+                return `[${String(newMinutes).padStart(2, "0")}:${String(newSeconds).padStart(2, "0")}]`;
+            }
+        });
+    }
+    
+    return text;
+}

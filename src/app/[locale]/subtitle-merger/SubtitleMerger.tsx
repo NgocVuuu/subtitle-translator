@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Card, Upload, Button, InputNumber, Select, Typography, Space, message, Divider } from 'antd';
 import { InboxOutlined, DownloadOutlined } from '@ant-design/icons';
-import { mergeSubtitles } from './mergerUtils';
+import { mergeSubtitles, adjustSingleSubtitle } from './mergerUtils';
 import { useTranslations } from "next-intl";
 
 const { Title, Text, Paragraph } = Typography;
@@ -15,9 +15,11 @@ export default function SubtitleMerger() {
 
     const [fileList1, setFileList1] = useState<{file: File, content: string}[]>([]);
     const [offset1, setOffset1] = useState<number>(0);
+    const [stretch1, setStretch1] = useState<number>(0);
 
     const [fileList2, setFileList2] = useState<{file: File, content: string}[]>([]);
     const [offset2, setOffset2] = useState<number>(0);
+    const [stretch2, setStretch2] = useState<number>(0);
 
     const [format, setFormat] = useState<"srt" | "vtt" | "ass">("ass");
 
@@ -35,25 +37,57 @@ export default function SubtitleMerger() {
         return false; // Prevent automatic upload
     };
 
+    const triggerDownload = (content: string, originalName: string, suffix: string) => {
+        const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        const ext = format;
+        const baseName = originalName.includes('.') ? originalName.substring(0, originalName.lastIndexOf('.')) : originalName;
+        a.download = `${baseName}_${suffix}.${ext}`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
     const handleMerge = () => {
-        if (fileList1.length === 0 || fileList2.length === 0) {
+        if (fileList1.length === 0 && fileList2.length === 0) {
             message.error(t("errorMissingFiles"));
             return;
         }
-
-        if (fileList1.length !== fileList2.length) {
-            message.error(t("errorCountMismatch"));
-            return;
-        }
-
-        // Sort files alphabetically to match them up
-        const sorted1 = [...fileList1].sort((a, b) => a.file.name.localeCompare(b.file.name));
-        const sorted2 = [...fileList2].sort((a, b) => a.file.name.localeCompare(b.file.name));
 
         try {
             // Convert seconds to ms
             const primaryOffsetMs = offset1 * 1000;
             const secondaryOffsetMs = offset2 * 1000;
+            const pStretchMs = stretch1 * 1000;
+            const sStretchMs = stretch2 * 1000;
+
+            if (fileList1.length > 0 && fileList2.length === 0) {
+                for (const f of fileList1) {
+                    const adjusted = adjustSingleSubtitle(f.content, primaryOffsetMs, pStretchMs, format);
+                    triggerDownload(adjusted, f.file.name, "adjusted");
+                }
+                message.success(t("successMerge"));
+                return;
+            }
+
+            if (fileList2.length > 0 && fileList1.length === 0) {
+                for (const f of fileList2) {
+                    const adjusted = adjustSingleSubtitle(f.content, secondaryOffsetMs, sStretchMs, format);
+                    triggerDownload(adjusted, f.file.name, "adjusted");
+                }
+                message.success(t("successMerge"));
+                return;
+            }
+
+            if (fileList1.length !== fileList2.length) {
+                message.error(t("errorCountMismatch"));
+                return;
+            }
+
+            // Sort files alphabetically to match them up
+            const sorted1 = [...fileList1].sort((a, b) => a.file.name.localeCompare(b.file.name));
+            const sorted2 = [...fileList2].sort((a, b) => a.file.name.localeCompare(b.file.name));
 
             for (let i = 0; i < sorted1.length; i++) {
                 const f1 = sorted1[i];
@@ -64,20 +98,12 @@ export default function SubtitleMerger() {
                     f2.content,
                     primaryOffsetMs,
                     secondaryOffsetMs,
+                    pStretchMs,
+                    sStretchMs,
                     format
                 );
 
-                // Trigger download
-                const blob = new Blob([mergedText], { type: "text/plain;charset=utf-8" });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                const ext = format;
-                const originalName = f1.file.name;
-                const baseName = originalName.includes('.') ? originalName.substring(0, originalName.lastIndexOf('.')) : originalName;
-                a.download = `${baseName}_merged.${ext}`;
-                a.click();
-                URL.revokeObjectURL(url);
+                triggerDownload(mergedText, f1.file.name, "merged");
             }
             
             message.success(t("successMerge"));
@@ -122,13 +148,23 @@ export default function SubtitleMerger() {
                             </div>
                         </div>
                     )}
-                    <div className="mt-4 flex items-center justify-between">
-                        <Text>{t("timeOffset")}</Text>
-                        <InputNumber 
-                            value={offset1} 
-                            onChange={(val) => setOffset1(val || 0)} 
-                            step={0.1}
-                        />
+                    <div className="mt-4 flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                            <Text>{t("timeOffset")}</Text>
+                            <InputNumber 
+                                value={offset1} 
+                                onChange={(val) => setOffset1(val || 0)} 
+                                step={0.1}
+                            />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <Text>{t("timeStretch")}</Text>
+                            <InputNumber 
+                                value={stretch1} 
+                                onChange={(val) => setStretch1(val || 0)} 
+                                step={0.1}
+                            />
+                        </div>
                     </div>
                 </Card>
 
@@ -159,13 +195,23 @@ export default function SubtitleMerger() {
                             </div>
                         </div>
                     )}
-                    <div className="mt-4 flex items-center justify-between">
-                        <Text>{t("timeOffset")}</Text>
-                        <InputNumber 
-                            value={offset2} 
-                            onChange={(val) => setOffset2(val || 0)} 
-                            step={0.1}
-                        />
+                    <div className="mt-4 flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                            <Text>{t("timeOffset")}</Text>
+                            <InputNumber 
+                                value={offset2} 
+                                onChange={(val) => setOffset2(val || 0)} 
+                                step={0.1}
+                            />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <Text>{t("timeStretch")}</Text>
+                            <InputNumber 
+                                value={stretch2} 
+                                onChange={(val) => setStretch2(val || 0)} 
+                                step={0.1}
+                            />
+                        </div>
                     </div>
                 </Card>
             </div>
@@ -187,7 +233,7 @@ export default function SubtitleMerger() {
                         icon={<DownloadOutlined />} 
                         size="large"
                         onClick={handleMerge}
-                        disabled={fileList1.length === 0 || fileList2.length === 0}
+                        disabled={fileList1.length === 0 && fileList2.length === 0}
                     >
                         {t("mergeBtn")}
                     </Button>

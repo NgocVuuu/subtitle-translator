@@ -163,7 +163,8 @@
     "noSourceText": "Vui lòng tải tệp hoặc dán văn bản.",
     "noExtractedText": "Không trích xuất được nội dung, kiểm tra định dạng tệp.",
     "textExtracted": "Đã trích xuất nội dung văn bản phụ đề, ",
-    "bilingualError": "Đã phát hiện thẻ phong cách phức tạp. Chế độ song ngữ có thể gây ra vấn đề định dạng. Khuyên dùng tắt chế độ 'Phụ đề Song ngữ'."
+    "bilingualError": "Đã phát hiện thẻ phong cách phức tạp. Chế độ song ngữ có thể gây ra vấn đề định dạng. Khuyên dùng tắt chế độ 'Phụ đề Song ngữ'.",
+    "timeOffset": "Dịch chuyển thời gian (giây):"
   },
   "SubtitleMerger": {
     "title": "Gộp Phụ Đề Song Ngữ",
@@ -172,6 +173,7 @@
     "secondaryCard": "Phụ đề dịch (Secondary) - Hiển thị ở trên",
     "uploadHint": "Nhấp hoặc kéo thả file vào đây",
     "timeOffset": "Dịch chuyển thời gian (giây):",
+    "timeStretch": "Độ co giãn cuối sub (giây):",
     "outputFormat": "Định dạng xuất ra:",
     "formatAss": "ASS (Đẹp nhất)",
     "formatSrt": "SRT (Phổ biến)",
